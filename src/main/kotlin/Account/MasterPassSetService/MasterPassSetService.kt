@@ -1,5 +1,6 @@
-package Account
+package Account.MasterPassSetService
 
+import Account.Account
 import Settings.Settings
 
 interface MasterPassSetService {

@@ -1,6 +1,6 @@
 package Settings
 
-import AccountEncoder.AccountEncoder
+import Account.AccountEncoder.AccountEncoder
 import java.lang.Exception
 
 interface Settings {

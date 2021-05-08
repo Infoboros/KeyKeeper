@@ -1,4 +1,4 @@
-package AccountEncoder
+package Account.AccountEncoder
 
 import Account.Account
 import Account.DefaultAccount
@@ -21,28 +21,28 @@ abstract class AbstractAccountEncoder : AccountEncoder {
 
     override fun encodeAccount(account: Account): Account =
             DefaultAccount(
-                    encodeString(account.getID()),
+                    encodeString(account.getUID()),
                     encodeString(account.getLogin()),
                     encodeString(account.getPassword())
             )
 
     override fun decodeAccount(account: Account): Account =
             DefaultAccount(
-                    decodeString(account.getID()),
+                    decodeString(account.getUID()),
                     decodeString(account.getLogin()),
                     decodeString(account.getPassword())
             )
 
     override fun encodeOnlyPassword(account: Account): Account =
             DefaultAccount(
-                    account.getID(),
+                    account.getUID(),
                     account.getLogin(),
                     encodeString(account.getPassword())
             )
 
     override fun decodeOnlyPassword(account: Account): Account =
             DefaultAccount(
-                    account.getID(),
+                    account.getUID(),
                     account.getLogin(),
                     decodeString(account.getPassword())
             )

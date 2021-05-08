@@ -1,6 +1,6 @@
 package Settings
 
-import AccountEncoder.AesEncoder
+import Account.AccountEncoder.AesEncoder
 
 interface SettingsService {
     fun loadSettings(): Settings;
