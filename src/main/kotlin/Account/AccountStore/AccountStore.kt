@@ -1,34 +1,35 @@
 package Account.AccountStore
 
 import Account.Account
+import Settings.Settings
 
-interface PasswordStore {
-    fun updatePassword(UID: String, password: String);
-    fun postPassword(login: String, password: String);
-    fun deletePassword();
+interface AccountStore {
+    fun updateAccount(UID: String, password: String);
+    fun postAccount(login: String, password: String);
+    fun deleteAccount(UID: String);
 }
 
 interface AccountLoader {
     fun getAllAccounts(): List<Account>;
 }
 
-class LocalAccountStore(_pathToData: String): PasswordStore, AccountLoader {
+class LocalAccountStore(_pathToData: String): AccountStore, AccountLoader {
 
-    private val pathToData = _pathToData;
+    private val _pathToData = _pathToData;
 
     override fun getAllAccounts(): List<Account> {
         TODO("Not yet implemented")
     }
 
-    override fun updatePassword(UID: String, password: String) {
+    override fun updateAccount(UID: String, password: String) {
         TODO("Not yet implemented")
     }
 
-    override fun postPassword(login: String, password: String) {
+    override fun postAccount(login: String, password: String) {
         TODO("Not yet implemented")
     }
 
-    override fun deletePassword() {
+    override fun deleteAccount(UID: String) {
         TODO("Not yet implemented")
     }
 

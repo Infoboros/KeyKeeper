@@ -5,18 +5,22 @@ import Specification.CompositeSpecification
 
 class AccountUIDSpecification(_UID: String): CompositeSpecification<Account>(){
 
-    private val UID = _UID;
+    private val UID = _UID
 
     override fun isSatisfiedBy(candidate: Account) =
-            candidate.getUID() == UID;
+            candidate.getUID() == UID
 
 }
 
 class AccountLoginSpecification(_login: String): CompositeSpecification<Account>(){
 
-    private val login = _login;
+    private val login = _login
 
     override fun isSatisfiedBy(candidate: Account) =
-            candidate.getLogin() == login;
+            candidate.getLogin() == login
 
+}
+
+class AccountAllSpecification(): CompositeSpecification<Account>(){
+    override fun isSatisfiedBy(candidate: Account) = true
 }

@@ -15,10 +15,11 @@ interface AccountRepositoryBuilder {
 }
 
 class AccountMapRepositoryBuilder(
-        _accountLoader: AccountLoader,
-        _sessionPassword: String,
-        _masterPassword: String,
-        _encoder: AccountEncoder) : AccountRepositoryBuilder {
+    _accountLoader: AccountLoader,
+    _sessionPassword: String,
+    _masterPassword: String,
+    _encoder: AccountEncoder
+) : AccountRepositoryBuilder {
 
     private val accountLoader = _accountLoader;
     private val sessionPassword = _sessionPassword;
@@ -33,10 +34,10 @@ class AccountMapRepositoryBuilder(
 
     override fun decodeMasterPassList() {
         val decodedAccounts = mutableListOf<Account>()
-        encoder.setKey(masterPassword);
+        val masterEncoder = encoder.getWithNewKey(masterPassword)
 
         accounts.forEach {
-            decodedAccounts.add(encoder.decodeAccount(it));
+            decodedAccounts.add(masterEncoder.decodeAccount(it));
         }
 
         accounts = decodedAccounts;
@@ -44,10 +45,10 @@ class AccountMapRepositoryBuilder(
 
     override fun encodeSessionPassword() {
         val encodedAccounts = mutableListOf<Account>()
-        encoder.setKey(sessionPassword);
+        val sessionEncoder = encoder.getWithNewKey(sessionPassword);
 
         accounts.forEach {
-            encodedAccounts.add(encoder.encodeOnlyPassword(it));
+            encodedAccounts.add(sessionEncoder.encodeOnlyPassword(it));
         }
 
         accounts = encodedAccounts;
@@ -58,6 +59,6 @@ class AccountMapRepositoryBuilder(
     }
 
     override fun getResult() =
-            AccountMapRepository(accounts);
+        AccountMapRepository(accounts);
 
 }

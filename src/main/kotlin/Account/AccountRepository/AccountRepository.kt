@@ -1,11 +1,11 @@
 package Account.AccountRepository
 
 import Account.Account
-import Specification.CompositeSpecification
+import Specification.ISpecification
 import java.lang.Exception
 
 interface AccountRepository {
-    fun filter(specification: CompositeSpecification<Account>): List<Account>;
+    fun filter(specification: ISpecification<Account>): List<Account>;
     fun getPassword(UID: String): String;
 
     class PasswordNotFound(_msg: String) : Exception(_msg);
@@ -21,7 +21,7 @@ class AccountMapRepository(_accounts: List<Account>) : AccountRepository {
         }
     }
 
-    override fun filter(specification: CompositeSpecification<Account>): List<Account> {
+    override fun filter(specification: ISpecification<Account>): List<Account> {
         val result: MutableList<Account> = mutableListOf();
         accounts.map { (_, account) ->
             {
