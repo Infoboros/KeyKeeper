@@ -20,14 +20,10 @@ class LocalSettingsService : SettingsService {
         if (!file.canRead())
             throw SettingsService.SettingsNotFound()
 
-        try {
-            val jsonData = file.readText()
-            val settingsData = Gson().fromJson<SettingsModel>(jsonData, SettingsModel::class.java)
+        val jsonData = file.readText()
+        val settingsData = Gson().fromJson<SettingsModel>(jsonData, SettingsModel::class.java)
 
-            return deserializeSettings(settingsData)
-        } catch (e: Exception) {
-            throw SettingsService.SettingsNotFound(e.toString())
-        }
+        return deserializeSettings(settingsData)
     }
 
     override fun saveSettings(settings: Settings) {
