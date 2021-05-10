@@ -58,7 +58,7 @@ class AccountViewer(
         if (param == "")
             specification = specification.or(AccountAllSpecification())
         return accountRepository.filter(specification).map {
-            "${it.getUID()}||${it.getLogin()}||${it.getPassword().slice(0..50)}"
+            "${it.getUID()}||${it.getLogin()}||${it.getPassword().padEnd(50).slice(0..49)}"
         }
     }
 
@@ -119,11 +119,13 @@ class AccountViewer(
 
     override fun configure(newSettings: Settings, newMasterPassword: String, oldMasterPassword: String) {
         if (masterPasswordValid(oldMasterPassword) && newSettings.validate(newMasterPassword, raiseException = true)) {
+            val oldEncoder = settings.getEncoder().getWithNewKey(oldMasterPassword)
+            val newEncoder = newSettings.getEncoder().getWithNewKey(newMasterPassword)
             settings = newSettings
             session = TimeOutSession(settings.getSessionTyme())
 
             val reCodeService = ConfigureReCodeAccountService(settings)
-            reCodeService.reCodeAccounts(accountStore.getAllAccounts(), newMasterPassword, oldMasterPassword)
+            reCodeService.reCodeAccounts(accountStore.getAllAccounts(), newEncoder, oldEncoder)
             accountStore = LocalAccountStore(settings.getPasswordPath())
 
             login(newMasterPassword)

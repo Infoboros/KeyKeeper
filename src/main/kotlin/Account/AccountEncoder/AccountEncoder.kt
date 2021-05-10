@@ -2,6 +2,11 @@ package Account.AccountEncoder
 
 import Account.Account
 import Account.DefaultAccount
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.DESKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 interface AccountEncoder {
     fun encodeAccount(account: Account): Account
@@ -50,8 +55,7 @@ abstract class AbstractAccountEncoder(_masterPass: String) : AccountEncoder {
         fun deserialize(data: String): AbstractAccountEncoder =
             when (data) {
                 "Aes" -> AesEncoder()
-                "Gost" -> GostEncoder()
-                "Idea" -> IdeaEncoder()
+                "Des" -> DesEncoder()
                 else -> AesEncoder()
             }
     }
@@ -60,12 +64,26 @@ abstract class AbstractAccountEncoder(_masterPass: String) : AccountEncoder {
 }
 
 class AesEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass) {
+    private fun getAesKey() = masterPass.padStart(16).slice(0..15)
+
     override fun encodeString(data: String): String {
-        return data + masterPass
+        val cipher = Cipher.getInstance("AES")
+
+        val keySpec = SecretKeySpec(getAesKey().toByteArray(), "AES")
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec)
+
+        val encrypt = cipher.doFinal(data.toByteArray())
+        return Base64.getEncoder().encodeToString(encrypt)
     }
 
     override fun decodeString(data: String): String {
-        return data.removeSuffix(masterPass)
+        val cipher = Cipher.getInstance("AES")
+
+        val keySpec: SecretKeySpec = SecretKeySpec(getAesKey().toByteArray(), "AES")
+        cipher.init(Cipher.DECRYPT_MODE, keySpec)
+
+        val encrypt = cipher.doFinal(Base64.getDecoder().decode(data))
+        return String(encrypt)
     }
 
     override fun getWithNewKey(key: String) =
@@ -75,34 +93,38 @@ class AesEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass)
         "Aes"
 }
 
-class GostEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass) {
+class DesEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass) {
+    private fun getDesKey() = masterPass.padStart(8).slice(0..7)
+
     override fun encodeString(data: String): String {
-        return data + masterPass
+        val c = Cipher.getInstance("DES")
+
+        val kf = SecretKeyFactory.getInstance("DES")
+        val keySpec = DESKeySpec(getDesKey().toByteArray())
+
+        val key = kf.generateSecret(keySpec)
+        c.init(Cipher.ENCRYPT_MODE, key)
+
+        val encrypt = c.doFinal(data.toByteArray())
+        return Base64.getEncoder().encodeToString(encrypt)
     }
 
     override fun decodeString(data: String): String {
-        return data.removeSuffix(masterPass)
+        val c = Cipher.getInstance("DES")
+
+        val kf = SecretKeyFactory.getInstance("DES")
+        val keySpec = DESKeySpec(getDesKey().toByteArray())
+
+        val key = kf.generateSecret(keySpec)
+        c.init(Cipher.DECRYPT_MODE, key)
+
+        val encrypt = c.doFinal(Base64.getDecoder().decode(data))
+        return String(encrypt)
     }
 
     override fun getWithNewKey(key: String) =
-        GostEncoder(key)
+        DesEncoder(key)
 
     override fun serialize() =
-        "Gost"
-}
-
-class IdeaEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass) {
-    override fun encodeString(data: String): String {
-        return data + masterPass
-    }
-
-    override fun decodeString(data: String): String {
-        return data.removeSuffix(masterPass)
-    }
-
-    override fun getWithNewKey(key: String) =
-        IdeaEncoder(key)
-
-    override fun serialize() =
-        "Idea"
+        "Des"
 }

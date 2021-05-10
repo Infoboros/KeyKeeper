@@ -36,7 +36,7 @@ class LocalSettingsService : SettingsService {
     private fun deserializeSettings(settingsData: SettingsData) =
         LocalSettings(
             settingsData.passwordPath,
-            AbstractAccountEncoder.deserialize(settingsData.passwordPath),
+            AbstractAccountEncoder.deserialize(settingsData.encoderName),
             settingsData.sessionTime,
             settingsData.hashMasterPass
         )
