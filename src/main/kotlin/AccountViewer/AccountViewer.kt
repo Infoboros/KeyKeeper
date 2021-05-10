@@ -1,6 +1,5 @@
 package AccountViewer
 
-import Account.Account
 import Account.AccountRepository.AccountRepository
 import Account.AccountRepositoryService.AccountMapRepositoryBuilder
 import Account.AccountRepositoryService.AccountRepositoryService
@@ -16,8 +15,10 @@ import Settings.IConfigurable
 import Settings.LocalSettingsService
 import Settings.Settings
 
-class AccountViewer(_settings: Settings,
-                    _masterPassword: String) : IAccountCRUD, ILoginAble, IConfigurable {
+class AccountViewer(
+    _settings: Settings,
+    _masterPassword: String
+) : IAccountCRUD, ILoginAble, IConfigurable {
 
     private var settings = _settings
     private var session: Session
@@ -28,11 +29,7 @@ class AccountViewer(_settings: Settings,
         settings.validate(_masterPassword, raiseException = true)
         session = TimeOutSession(settings.getSessionTyme())
         accountStore = LocalAccountStore(settings.getPasswordPath())
-        val accountRepositoryBuilder = AccountMapRepositoryBuilder(accountStore,
-                session.getSessionPassword(),
-                _masterPassword,
-                settings.getEncoder())
-        accountRepository = AccountRepositoryService(accountRepositoryBuilder).construct()
+        accountRepository = reBuildAccountRepository(_masterPassword)
     }
 
     private fun masterPasswordValid(password: String, raiseException: Boolean = false): Boolean {
@@ -44,35 +41,61 @@ class AccountViewer(_settings: Settings,
     }
 
     private fun getEncoderWithPassword(password: String) =
-            settings.getEncoder()
+        settings.getEncoder().getWithNewKey(password)
 
-    override fun filterAccounts(param: String): List<Account> {
+    private fun reBuildAccountRepository(masterPassword: String): AccountRepository {
+        val accountRepositoryBuilder = AccountMapRepositoryBuilder(
+            accountStore,
+            session.getSessionPassword(),
+            masterPassword,
+            settings.getEncoder()
+        )
+        return AccountRepositoryService(accountRepositoryBuilder).construct()
+    }
+
+    override fun filterAccounts(param: String): List<String> {
         var specification = AccountUIDSpecification(param).or(AccountLoginSpecification(param))
         if (param == "")
             specification = specification.or(AccountAllSpecification())
-        return accountRepository.filter(specification)
+        return accountRepository.filter(specification).map {
+            "${it.getUID()}||${it.getLogin()}||${it.getPassword().slice(0..50)}"
+        }
     }
 
     override fun getAccountPassword(UID: String): String {
         val encoder = getEncoderWithPassword(session.getSessionPassword())
-        val encodePassword = accountRepository.getPassword(UID)
-
-        return encoder.decodeString(encodePassword)
+        try {
+            val encodePassword = accountRepository.getPassword(UID)
+            return encoder.decodeString(encodePassword)
+        } catch (e: AccountRepository.PasswordNotFound) {
+            throw IAccountCRUD.AccountNotFound(UID)
+        }
     }
 
     override fun updateAccount(UID: String, password: String, masterPassword: String) {
         if (masterPasswordValid(masterPassword, raiseException = true)) {
             val encoder = getEncoderWithPassword(masterPassword)
-            accountStore.updateAccount(encoder.encodeString(UID),
-                    encoder.encodeString(password))
+            accountStore.updateAccount(
+                encoder.encodeString(UID),
+                encoder.encodeString(password)
+            )
+            accountRepository = reBuildAccountRepository(masterPassword)
         }
     }
 
     override fun postAccount(login: String, password: String, masterPassword: String) {
         if (masterPasswordValid(masterPassword, raiseException = true)) {
             val encoder = getEncoderWithPassword(masterPassword)
-            accountStore.postAccount(encoder.encodeString(login),
-                    encoder.encodeString(password))
+            val UID = (login+password+System.currentTimeMillis().toString())
+                .hashCode()
+                .toString()
+
+            accountStore.postAccount(
+                encoder.encodeString(UID),
+                encoder.encodeString(login),
+                encoder.encodeString(password)
+            )
+            accountRepository = reBuildAccountRepository(masterPassword)
         }
     }
 
@@ -80,22 +103,19 @@ class AccountViewer(_settings: Settings,
         if (masterPasswordValid(masterPassword, raiseException = true)) {
             val encoder = getEncoderWithPassword(masterPassword)
             accountStore.deleteAccount(encoder.encodeString(UID))
+            accountRepository = reBuildAccountRepository(masterPassword)
         }
     }
 
     override fun login(masterPassword: String) {
-        if (masterPasswordValid(masterPassword, raiseException = true)){
+        if (masterPasswordValid(masterPassword, raiseException = true)) {
             session = TimeOutSession(settings.getSessionTyme())
-            val accountRepositoryBuilder = AccountMapRepositoryBuilder(accountStore,
-                                                                       session.getSessionPassword(),
-                                                                       masterPassword,
-                                                                       settings.getEncoder())
-            accountRepository = AccountRepositoryService(accountRepositoryBuilder).construct()
+            accountRepository = reBuildAccountRepository(masterPassword)
         }
     }
 
     override fun getSettings() =
-            settings
+        settings
 
     override fun configure(newSettings: Settings, newMasterPassword: String, oldMasterPassword: String) {
         if (masterPasswordValid(oldMasterPassword) && newSettings.validate(newMasterPassword, raiseException = true)) {

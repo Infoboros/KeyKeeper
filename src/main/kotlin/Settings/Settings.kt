@@ -9,6 +9,8 @@ interface Settings {
     fun getSessionTyme(): Int;
     fun getHashMasterPass(): Int;
     fun validate(masterPassword: String, raiseException: Boolean = false): Boolean;
+
+    class SettingsValidateException(_msg: String): Exception(_msg);
 }
 
 class LocalSettings(
@@ -23,8 +25,15 @@ class LocalSettings(
     private var sessionTime = _sessionTime;
     private var hashMasterPass = _hashMasterPass;
 
-    override fun validate(masterPassword: String, raiseException: Boolean): Boolean =
-            true;
+    override fun validate(masterPassword: String, raiseException: Boolean): Boolean{
+        if (hashMasterPass != masterPassword.hashCode())
+            if (raiseException)
+                throw Settings.SettingsValidateException("Input master password incorrect!")
+            else
+                return false
+        return true
+    }
+
 
     override fun getPasswordPath() = passwordPath;
 
@@ -33,7 +42,5 @@ class LocalSettings(
     override fun getSessionTyme() = sessionTime;
 
     override fun getHashMasterPass() = hashMasterPass;
-
-    class SettingsValidateException(_msg: String): Exception(_msg);
 
 }

@@ -16,19 +16,18 @@ class AccountMapRepository(_accounts: List<Account>) : AccountRepository {
     private val accounts: MutableMap<String, Account> = mutableMapOf();
 
     init {
-        _accounts.forEach {
-            accounts.plus(Pair(it.getUID(), it));
-        }
+        for (account in _accounts)
+            accounts += (Pair(account.getUID(), account));
     }
 
     override fun filter(specification: ISpecification<Account>): List<Account> {
         val result: MutableList<Account> = mutableListOf();
-        accounts.map { (_, account) ->
-            {
+        accounts.forEach { (_, account) ->
+            run {
                 if (specification.isSatisfiedBy(account))
-                    result += account;
+                    result += account
             }
-        };
+        }
         return result;
     }
 

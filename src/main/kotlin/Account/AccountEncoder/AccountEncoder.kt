@@ -65,7 +65,7 @@ class AesEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass)
     }
 
     override fun decodeString(data: String): String {
-        return data.removeSuffix(data)
+        return data.removeSuffix(masterPass)
     }
 
     override fun getWithNewKey(key: String) =
@@ -81,7 +81,7 @@ class GostEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass
     }
 
     override fun decodeString(data: String): String {
-        return data.removeSuffix(data)
+        return data.removeSuffix(masterPass)
     }
 
     override fun getWithNewKey(key: String) =
@@ -97,7 +97,7 @@ class IdeaEncoder(_masterPass: String = "") : AbstractAccountEncoder(_masterPass
     }
 
     override fun decodeString(data: String): String {
-        return data.removeSuffix(data)
+        return data.removeSuffix(masterPass)
     }
 
     override fun getWithNewKey(key: String) =

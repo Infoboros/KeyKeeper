@@ -4,7 +4,6 @@ import Settings.LocalSettingsService
 import UI.ConsoleUI
 
 fun main(args: Array<String>) {
-    ConsoleUI()
-
+    ConsoleUI().start()
     return
 }

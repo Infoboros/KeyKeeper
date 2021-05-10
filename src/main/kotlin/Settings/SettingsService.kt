@@ -21,7 +21,7 @@ class LocalSettingsService : SettingsService {
             throw SettingsService.SettingsNotFound()
 
         val jsonData = file.readText()
-        val settingsData = Gson().fromJson<SettingsModel>(jsonData, SettingsModel::class.java)
+        val settingsData = Gson().fromJson<SettingsData>(jsonData, SettingsData::class.java)
 
         return deserializeSettings(settingsData)
     }
@@ -33,14 +33,7 @@ class LocalSettingsService : SettingsService {
         file.writeText(jsonData)
     }
 
-    data class SettingsModel(
-        val passwordPath: String,
-        val encoderName: String,
-        val sessionTime: Int,
-        val hashMasterPass: Int
-    )
-
-    private fun deserializeSettings(settingsData: SettingsModel) =
+    private fun deserializeSettings(settingsData: SettingsData) =
         LocalSettings(
             settingsData.passwordPath,
             AbstractAccountEncoder.deserialize(settingsData.passwordPath),
@@ -49,7 +42,7 @@ class LocalSettingsService : SettingsService {
         )
 
     private fun serializeSettings(settings: Settings) =
-        SettingsModel(
+        SettingsData(
             settings.getPasswordPath(),
             settings.getEncoder().serialize(),
             settings.getSessionTyme(),
