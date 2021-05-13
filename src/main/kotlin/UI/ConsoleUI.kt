@@ -2,14 +2,14 @@ package UI
 
 import Account.AccountEncoder.AbstractAccountEncoder
 import AccountViewer.AccountViewer
-import AccountViewer.IAccountCRUD
+import AccountViewer.IAccountDAO
 import Settings.*
 
 class ConsoleUI {
     private val accountViewer: AccountViewer
 
     init {
-        var settings: Settings? = null
+        var settings: Settings?
         try {
             settings = LocalSettingsService().loadSettings()
         } catch (e: SettingsService.SettingsNotFound) {
@@ -70,7 +70,7 @@ class ConsoleUI {
         val UID = customInputString()
         try {
             println("Your Password: ${accountViewer.getAccountPassword(UID)}")
-        } catch (e: IAccountCRUD.AccountNotFound) {
+        } catch (e: IAccountDAO.AccountNotFound) {
             println(e.message)
         }
     }

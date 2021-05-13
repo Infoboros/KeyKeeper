@@ -4,13 +4,13 @@ import Account.AccountEncoder.AbstractAccountEncoder
 import java.lang.Exception
 
 interface Settings {
-    fun getPasswordPath(): String;
-    fun getEncoder(): AbstractAccountEncoder;
-    fun getSessionTyme(): Int;
-    fun getHashMasterPass(): Int;
-    fun validate(masterPassword: String, raiseException: Boolean = false): Boolean;
+    fun getPasswordPath(): String
+    fun getEncoder(): AbstractAccountEncoder
+    fun getSessionTyme(): Int
+    fun getHashMasterPass(): Int
+    fun validate(masterPassword: String, raiseException: Boolean = false): Boolean
 
-    class SettingsValidateException(_msg: String) : Exception(_msg);
+    class SettingsValidateException(_msg: String) : Exception(_msg)
 }
 
 open class LocalSettings(
@@ -20,10 +20,10 @@ open class LocalSettings(
     _hashMasterPass: Int
 ) : Settings {
 
-    private var passwordPath = _passwordDir;
-    private var encoder = _encoder;
-    private var sessionTime = _sessionTime;
-    private var hashMasterPass = _hashMasterPass;
+    private var passwordPath = _passwordDir
+    private var encoder = _encoder
+    private var sessionTime = _sessionTime
+    private var hashMasterPass = _hashMasterPass
 
     override fun validate(masterPassword: String, raiseException: Boolean): Boolean {
         if (hashMasterPass != masterPassword.hashCode())
@@ -35,13 +35,13 @@ open class LocalSettings(
     }
 
 
-    override fun getPasswordPath() = passwordPath;
+    override fun getPasswordPath() = passwordPath
 
-    override fun getEncoder() = encoder;
+    override fun getEncoder() = encoder
 
-    override fun getSessionTyme() = sessionTime;
+    override fun getSessionTyme() = sessionTime
 
-    override fun getHashMasterPass() = hashMasterPass;
+    override fun getHashMasterPass() = hashMasterPass
 
 }
 

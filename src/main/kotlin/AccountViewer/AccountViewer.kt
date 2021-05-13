@@ -8,7 +8,7 @@ import Account.AccountSpecification.AccountLoginSpecification
 import Account.AccountSpecification.AccountUIDSpecification
 import Account.AccountStore.LocalAccountStore
 import Account.ReCodeAccountService.ConfigureReCodeAccountService
-import Session.ILoginAble
+import Session.ILoginable
 import Session.Session
 import Session.TimeOutSession
 import Settings.IConfigurable
@@ -18,7 +18,7 @@ import Settings.Settings
 class AccountViewer(
     _settings: Settings,
     _masterPassword: String
-) : IAccountCRUD, ILoginAble, IConfigurable {
+) : IAccountDAO, ILoginable, IConfigurable {
 
     private var settings = _settings
     private var session: Session
@@ -67,7 +67,7 @@ class AccountViewer(
             val encodePassword = accountRepository.getPassword(UID)
             return encoder.decodeString(encodePassword)
         } catch (e: AccountRepository.PasswordNotFound) {
-            throw IAccountCRUD.AccountNotFound(UID)
+            throw IAccountDAO.AccountNotFound(UID)
         }
     }
 
