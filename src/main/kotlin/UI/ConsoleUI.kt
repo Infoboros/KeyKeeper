@@ -3,10 +3,7 @@ package UI
 import Account.AccountEncoder.AbstractAccountEncoder
 import AccountViewer.AccountViewer
 import AccountViewer.IAccountCRUD
-import Settings.LocalSettings
-import Settings.LocalSettingsService
-import Settings.Settings
-import Settings.SettingsService
+import Settings.*
 
 class ConsoleUI {
     private val accountViewer: AccountViewer
@@ -20,7 +17,9 @@ class ConsoleUI {
             LocalSettingsService().saveSettings(settings)
         }
         println("Input master password:")
-        accountViewer = AccountViewer(settings!!, customInputString())
+        val masterPassword = customInputString()
+        settings!!.validate(masterPassword, raiseException = true)
+        accountViewer = AccountViewer(settings, masterPassword)
     }
 
     private fun customInputString(): String {
@@ -41,16 +40,17 @@ class ConsoleUI {
         val encoderType = customInputString()
 
         println("Input time out of session: ")
-        val timeOutSession = customInputString().toInt()
+        val timeOutSession = customInputString()
 
         println("Input master password: ")
-        val hashMasterPass = customInputString().hashCode()
+        val hashMasterPass = customInputString()
 
 
-        return LocalSettings(
+        return StringSettings(
             pathToPasswords,
             AbstractAccountEncoder.deserialize(encoderType),
-            timeOutSession, hashMasterPass
+            timeOutSession,
+            hashMasterPass
         )
     }
 

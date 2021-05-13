@@ -10,14 +10,14 @@ interface Settings {
     fun getHashMasterPass(): Int;
     fun validate(masterPassword: String, raiseException: Boolean = false): Boolean;
 
-    class SettingsValidateException(_msg: String): Exception(_msg);
+    class SettingsValidateException(_msg: String) : Exception(_msg);
 }
 
-class LocalSettings(
-        _passwordDir: String,
-        _encoder: AbstractAccountEncoder,
-        _sessionTime: Int,
-        _hashMasterPass: Int
+open class LocalSettings(
+    _passwordDir: String,
+    _encoder: AbstractAccountEncoder,
+    _sessionTime: Int,
+    _hashMasterPass: Int
 ) : Settings {
 
     private var passwordPath = _passwordDir;
@@ -25,7 +25,7 @@ class LocalSettings(
     private var sessionTime = _sessionTime;
     private var hashMasterPass = _hashMasterPass;
 
-    override fun validate(masterPassword: String, raiseException: Boolean): Boolean{
+    override fun validate(masterPassword: String, raiseException: Boolean): Boolean {
         if (hashMasterPass != masterPassword.hashCode())
             if (raiseException)
                 throw Settings.SettingsValidateException("Input master password incorrect!")
@@ -44,3 +44,15 @@ class LocalSettings(
     override fun getHashMasterPass() = hashMasterPass;
 
 }
+
+class StringSettings(
+    _passwordDir: String,
+    _encoder: AbstractAccountEncoder,
+    _sessionTime: String,
+    _masterPass: String
+) : LocalSettings(
+    _passwordDir,
+    _encoder,
+    _sessionTime.toInt(),
+    _masterPass.hashCode()
+)

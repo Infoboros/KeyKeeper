@@ -26,7 +26,6 @@ class AccountViewer(
     private var accountRepository: AccountRepository
 
     init {
-        settings.validate(_masterPassword, raiseException = true)
         session = TimeOutSession(settings.getSessionTyme())
         accountStore = LocalAccountStore(settings.getPasswordPath())
         accountRepository = reBuildAccountRepository(_masterPassword)
