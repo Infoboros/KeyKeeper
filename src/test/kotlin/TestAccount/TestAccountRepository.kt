@@ -3,14 +3,11 @@ package TestAccount
 import Account.Account
 import Account.AccountRepository.AccountRepository
 import Account.AccountSpecification.*
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.factory
 import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.lazy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import kotlin.test.assertTrue
 
 class TestLocalAccountRepository {
 
