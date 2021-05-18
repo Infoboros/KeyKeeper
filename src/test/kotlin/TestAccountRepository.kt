@@ -1,5 +1,3 @@
-package TestAccount
-
 import Account.Account
 import Account.AccountRepository.AccountRepository
 import Account.AccountSpecification.*

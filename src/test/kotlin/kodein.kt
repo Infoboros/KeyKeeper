@@ -1,10 +1,13 @@
-package TestAccount
-
 import Account.Account
+import Account.AccountEncoder.*
 import Account.AccountRepository.AccountMapRepository
 import Account.AccountRepository.AccountRepository
 import Account.AccountStore.LocalAccountStore
 import Account.DefaultAccount
+import Settings.LocalSettingsService
+import Settings.Settings
+import Settings.SettingsService
+import Settings.StringSettings
 import com.github.salomonbrys.kodein.*
 
 fun getTestKodein() = Kodein {
@@ -18,4 +21,14 @@ fun getTestKodein() = Kodein {
     constant(tag = "NotFoundUID") with "355"
 
     bind<LocalAccountStore>() with provider { LocalAccountStore(System.currentTimeMillis().toString()) }
+
+    bind<AbstractAccountEncoder>() with provider { AesEncoder() }
+
+    bind<SettingsService>() with provider { LocalSettingsService() }
+    bind<Settings>() with provider { StringSettings(
+        "passwordDir",
+        instance(),
+        "120",
+        "masterPassword"
+    ) }
 }
